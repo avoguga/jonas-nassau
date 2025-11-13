@@ -17,34 +17,45 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.9);
+      background: linear-gradient(135deg, rgba(0,0,0,0.95), rgba(20,20,40,0.95));
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       z-index: 9999;
       cursor: pointer;
     }
+    #play-overlay h1 {
+      color: #00ff88;
+      font-size: 48px;
+      margin-bottom: 20px;
+      font-family: 'Arial Black', sans-serif;
+      text-shadow: 0 0 20px rgba(0,255,136,0.5);
+    }
     #play-overlay button {
-      padding: 30px 60px;
-      font-size: 32px;
+      padding: 30px 70px;
+      font-size: 36px;
       background: linear-gradient(135deg, #00ff88, #00cc66);
       color: #000;
       border: none;
-      border-radius: 50px;
+      border-radius: 60px;
       cursor: pointer;
       font-weight: bold;
-      box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
-      transition: transform 0.2s;
+      box-shadow: 0 15px 40px rgba(0, 255, 136, 0.6);
+      transition: all 0.3s;
+      font-family: 'Arial Black', sans-serif;
     }
     #play-overlay button:hover {
-      transform: scale(1.1);
+      transform: scale(1.1) translateY(-5px);
+      box-shadow: 0 20px 50px rgba(0, 255, 136, 0.8);
     }
   </style>
 </head>
 <body>
   <!-- Overlay de Play -->
   <div id="play-overlay">
-    <button id="start-button">▶ TOQUE PARA INICIAR</button>
+    <h1>🏃 CORRIDA VR</h1>
+    <button id="start-button">▶ INICIAR EXPERIÊNCIA</button>
   </div>
 
   <a-scene>
@@ -71,37 +82,80 @@
         <a-cursor color="#00FF88"></a-cursor>
 
         <!-- UI fixa na câmera (HUD) - Canto Inferior Esquerdo -->
-        <a-entity id="hud" position="-1.2 -0.8 -2">
+        <a-entity id="hud" position="-1.4 -0.75 -2.2">
 
-          <!-- Fundo do painel -->
-          <a-plane color="#000000" opacity="0.8" width="0.8" height="0.7"
-                   radius="0.05"></a-plane>
+          <!-- Fundo principal com gradiente simulado -->
+          <a-plane color="#0a0a1a" opacity="0.92" width="1.1" height="0.95"
+                   radius="0.08" position="0.55 0.475 -0.01"></a-plane>
 
-          <!-- Velocidade -->
-          <a-entity position="0.05 0.25 0.01">
-            <a-text value="VELOCIDADE" color="#00ff88" width="1.2"
-                    align="left" shader="flat"></a-text>
-            <a-text id="speed-text" value="0.0 km/h" color="#ffffff"
-                    width="1.5" align="left" position="0 -0.08 0"
-                    shader="flat"></a-text>
+          <!-- Borda decorativa -->
+          <a-plane color="#00ff88" opacity="0.3" width="1.14" height="0.99"
+                   radius="0.09" position="0.55 0.475 -0.02"></a-plane>
+
+          <!-- Header -->
+          <a-entity position="0.1 0.85 0.01">
+            <a-text value="🏃 MÉTRICAS" color="#00ff88" width="1.8"
+                    align="left" shader="flat" font="roboto"></a-text>
           </a-entity>
 
-          <!-- Passos -->
-          <a-entity position="0.05 0 0.01">
-            <a-text value="PASSOS" color="#ff6b6b" width="1.2"
+          <!-- Linha divisória -->
+          <a-plane color="#00ff88" opacity="0.5" width="0.95" height="0.01"
+                   position="0.525 0.72 0.01"></a-plane>
+
+          <!-- Card de Velocidade -->
+          <a-entity position="0.1 0.55 0.01">
+            <!-- Ícone de fundo -->
+            <a-plane color="#00ff88" opacity="0.15" width="0.9" height="0.18"
+                     radius="0.03" position="0.4 0 -0.005"></a-plane>
+            <a-text value="⚡ VELOCIDADE" color="#00ff88" width="1.3"
                     align="left" shader="flat"></a-text>
-            <a-text id="steps-text" value="0" color="#ffffff"
-                    width="1.5" align="left" position="0 -0.08 0"
-                    shader="flat"></a-text>
+            <a-text id="speed-value" value="0.0" color="#ffffff"
+                    width="2.5" align="left" position="0 -0.12 0"
+                    shader="flat" font="roboto"></a-text>
+            <a-text value="km/h" color="#aaaaaa" width="0.9"
+                    align="left" position="0.45 -0.12 0" shader="flat"></a-text>
           </a-entity>
 
-          <!-- Distância -->
-          <a-entity position="0.05 -0.25 0.01">
-            <a-text value="DISTANCIA" color="#4ecdc4" width="1.2"
+          <!-- Card de Passos -->
+          <a-entity position="0.1 0.25 0.01">
+            <!-- Ícone de fundo -->
+            <a-plane color="#ff6b6b" opacity="0.15" width="0.9" height="0.18"
+                     radius="0.03" position="0.4 0 -0.005"></a-plane>
+            <a-text value="👣 PASSOS" color="#ff6b6b" width="1.3"
                     align="left" shader="flat"></a-text>
-            <a-text id="distance-text" value="0.0 m" color="#ffffff"
-                    width="1.5" align="left" position="0 -0.08 0"
-                    shader="flat"></a-text>
+            <a-text id="steps-value" value="0" color="#ffffff"
+                    width="2.5" align="left" position="0 -0.12 0"
+                    shader="flat" font="roboto"></a-text>
+            <a-text value="steps" color="#aaaaaa" width="0.9"
+                    align="left" position="0.35 -0.12 0" shader="flat"></a-text>
+          </a-entity>
+
+          <!-- Card de Distância -->
+          <a-entity position="0.1 -0.05 0.01">
+            <!-- Ícone de fundo -->
+            <a-plane color="#4ecdc4" opacity="0.15" width="0.9" height="0.18"
+                     radius="0.03" position="0.4 0 -0.005"></a-plane>
+            <a-text value="📍 DISTÂNCIA" color="#4ecdc4" width="1.3"
+                    align="left" shader="flat"></a-text>
+            <a-text id="distance-value" value="0.0" color="#ffffff"
+                    width="2.5" align="left" position="0 -0.12 0"
+                    shader="flat" font="roboto"></a-text>
+            <a-text value="metros" color="#aaaaaa" width="0.9"
+                    align="left" position="0.45 -0.12 0" shader="flat"></a-text>
+          </a-entity>
+
+          <!-- Card de Tempo -->
+          <a-entity position="0.1 -0.35 0.01">
+            <!-- Ícone de fundo -->
+            <a-plane color="#ffd93d" opacity="0.15" width="0.9" height="0.18"
+                     radius="0.03" position="0.4 0 -0.005"></a-plane>
+            <a-text value="⏱️ TEMPO" color="#ffd93d" width="1.3"
+                    align="left" shader="flat"></a-text>
+            <a-text id="time-value" value="00:00" color="#ffffff"
+                    width="2.2" align="left" position="0 -0.12 0"
+                    shader="flat" font="roboto"></a-text>
+            <a-text value="min" color="#aaaaaa" width="0.9"
+                    align="left" position="0.4 -0.12 0" shader="flat"></a-text>
           </a-entity>
 
         </a-entity>
@@ -113,74 +167,121 @@
   </a-scene>
 
   <script>
-    AFRAME.registerComponent('vr-metrics', {
+    // Componente de simulação de corrida
+    AFRAME.registerComponent('running-simulator', {
       init: function() {
-        this.lastPosition = new THREE.Vector3();
+        this.isRunning = false;
+        this.startTime = 0;
+        this.elapsedTime = 0;
+
+        // Métricas da corrida
         this.totalDistance = 0;
         this.steps = 0;
-        this.speed = 0;
-        this.lastTime = Date.now();
-        this.stepThreshold = 0.5;
-        this.distanceSinceLastStep = 0;
+        this.currentSpeed = 0;
+        this.targetSpeed = 0;
+
+        // Parâmetros da corrida
+        this.baseSpeed = 8; // km/h base
+        this.maxSpeed = 15; // km/h máximo
+        this.minSpeed = 5; // km/h mínimo
 
         // Referências aos elementos de texto
-        this.speedText = document.querySelector('#speed-text');
-        this.stepsText = document.querySelector('#steps-text');
-        this.distanceText = document.querySelector('#distance-text');
+        this.speedText = document.querySelector('#speed-value');
+        this.stepsText = document.querySelector('#steps-value');
+        this.distanceText = document.querySelector('#distance-value');
+        this.timeText = document.querySelector('#time-value');
+
+        // Para controle de passos
+        this.stepTimer = 0;
+        this.stepInterval = 0.5; // segundos entre passos na velocidade base
       },
 
-      tick: function() {
-        const currentPosition = this.el.object3D.position;
-        const currentTime = Date.now();
-        const deltaTime = (currentTime - this.lastTime) / 1000;
+      start: function() {
+        this.isRunning = true;
+        this.startTime = Date.now();
+        console.log('Simulação de corrida iniciada!');
+      },
 
-        const distance = currentPosition.distanceTo(this.lastPosition);
+      stop: function() {
+        this.isRunning = false;
+      },
 
-        if (distance > 0.001) {
-          this.totalDistance += distance;
-          this.distanceSinceLastStep += distance;
+      tick: function(time, deltaTime) {
+        if (!this.isRunning) return;
 
-          // Calcula velocidade (m/s para km/h)
-          this.speed = (distance / deltaTime) * 3.6;
+        const deltaSec = deltaTime / 1000;
+        this.elapsedTime = (Date.now() - this.startTime) / 1000;
 
-          // Conta passos
-          if (this.distanceSinceLastStep >= this.stepThreshold) {
-            this.steps++;
-            this.distanceSinceLastStep = 0;
-          }
+        // Varia a velocidade alvo de forma suave e realística
+        // Usa seno para criar variações naturais
+        const speedVariation = Math.sin(this.elapsedTime * 0.3) * 2 +
+                              Math.sin(this.elapsedTime * 0.7) * 1.5;
+        this.targetSpeed = this.baseSpeed + speedVariation;
+        this.targetSpeed = Math.max(this.minSpeed, Math.min(this.maxSpeed, this.targetSpeed));
 
-          // Atualiza UI
-          if (this.speedText) {
-            this.speedText.setAttribute('value', this.speed.toFixed(1) + ' km/h');
-          }
-          if (this.stepsText) {
-            this.stepsText.setAttribute('value', this.steps.toString());
-          }
-          if (this.distanceText) {
-            this.distanceText.setAttribute('value', this.totalDistance.toFixed(1) + ' m');
-          }
+        // Interpola suavemente para a velocidade alvo
+        this.currentSpeed += (this.targetSpeed - this.currentSpeed) * 0.05;
+
+        // Calcula distância percorrida neste frame
+        // Velocidade em km/h -> m/s -> metros percorridos
+        const distanceThisFrame = (this.currentSpeed / 3.6) * deltaSec;
+        this.totalDistance += distanceThisFrame;
+
+        // Calcula passos baseado na velocidade
+        // Quanto mais rápido, menos tempo entre passos
+        const currentStepInterval = this.stepInterval * (this.baseSpeed / this.currentSpeed);
+        this.stepTimer += deltaSec;
+
+        if (this.stepTimer >= currentStepInterval) {
+          this.steps++;
+          this.stepTimer = 0;
         }
 
-        this.lastPosition.copy(currentPosition);
-        this.lastTime = currentTime;
+        // Atualiza UI
+        this.updateUI();
+      },
+
+      updateUI: function() {
+        if (this.speedText) {
+          this.speedText.setAttribute('value', this.currentSpeed.toFixed(1));
+        }
+        if (this.stepsText) {
+          this.stepsText.setAttribute('value', this.steps.toString());
+        }
+        if (this.distanceText) {
+          this.distanceText.setAttribute('value', this.totalDistance.toFixed(0));
+        }
+        if (this.timeText) {
+          const minutes = Math.floor(this.elapsedTime / 60);
+          const seconds = Math.floor(this.elapsedTime % 60);
+          const timeStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+          this.timeText.setAttribute('value', timeStr);
+        }
       }
     });
 
-    // Sistema de inicialização
+    // Sistema de controle de vídeo
     AFRAME.registerComponent('video-controls', {
       init: function() {
         const video = document.querySelector('#video360');
         const startButton = document.querySelector('#start-button');
         const playOverlay = document.querySelector('#play-overlay');
+        const cameraRig = document.querySelector('#camera-rig');
 
-        // Função para iniciar vídeo
-        const startVideo = () => {
-          console.log('Iniciando vídeo...');
+        // Função para iniciar vídeo e simulação
+        const startExperience = () => {
+          console.log('Iniciando experiência...');
 
-          // Tenta múltiplos métodos para garantir que o vídeo toque
+          // Inicia o vídeo
           video.play().then(() => {
             console.log('Vídeo iniciado com sucesso!');
             playOverlay.style.display = 'none';
+
+            // Inicia a simulação de corrida
+            const simulator = cameraRig.components['running-simulator'];
+            if (simulator) {
+              simulator.start();
+            }
           }).catch((error) => {
             console.error('Erro ao iniciar vídeo:', error);
             // Tenta método alternativo do A-Frame
@@ -190,6 +291,12 @@
                 const videoElement = videosphere.components.material.material.map.image;
                 videoElement.play();
                 playOverlay.style.display = 'none';
+
+                // Inicia a simulação de corrida
+                const simulator = cameraRig.components['running-simulator'];
+                if (simulator) {
+                  simulator.start();
+                }
               }
             } catch(e) {
               console.error('Método alternativo falhou:', e);
@@ -199,7 +306,7 @@
 
         // Evento do botão
         if (startButton) {
-          startButton.addEventListener('click', startVideo);
+          startButton.addEventListener('click', startExperience);
         }
 
         // Previne autoplay
@@ -217,7 +324,7 @@
         // Adiciona componentes
         const cameraRig = document.querySelector('#camera-rig');
         if (cameraRig) {
-          cameraRig.setAttribute('vr-metrics', '');
+          cameraRig.setAttribute('running-simulator', '');
         }
 
         const sceneEl = document.querySelector('a-scene');
