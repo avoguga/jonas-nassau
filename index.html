@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Corrida VR - Protótipo</title>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    #play-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      cursor: pointer;
+    }
+    #play-overlay button {
+      padding: 30px 60px;
+      font-size: 32px;
+      background: linear-gradient(135deg, #00ff88, #00cc66);
+      color: #000;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
+      transition: transform 0.2s;
+    }
+    #play-overlay button:hover {
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+  <!-- Overlay de Play -->
+  <div id="play-overlay">
+    <button id="start-button">▶ TOQUE PARA INICIAR</button>
+  </div>
+
+  <a-scene>
+    <!-- Assets -->
+    <a-assets>
+      <!-- Vídeo 360 Equirectangular - jfk.webm -->
+      <video id="video360"
+             playsinline
+             webkit-playsinline
+             loop="true"
+             muted
+             preload="auto"
+             crossorigin="anonymous">
+        <source src="jfk.webm" type="video/webm">
+      </video>
+    </a-assets>
+
+    <!-- Vídeo 360 como videosphere -->
+    <a-videosphere src="#video360" rotation="0 180 0"></a-videosphere>
+
+    <!-- Câmera com controles -->
+    <a-entity id="camera-rig" position="0 0 0">
+      <a-camera id="main-camera" look-controls wasd-controls="acceleration: 20">
+        <a-cursor color="#00FF88"></a-cursor>
+
+        <!-- UI fixa na câmera (HUD) - Canto Inferior Esquerdo -->
+        <a-entity id="hud" position="-1.2 -0.8 -2">
+
+          <!-- Fundo do painel -->
+          <a-plane color="#000000" opacity="0.8" width="0.8" height="0.7"
+                   radius="0.05"></a-plane>
+
+          <!-- Velocidade -->
+          <a-entity position="0.05 0.25 0.01">
+            <a-text value="VELOCIDADE" color="#00ff88" width="1.2"
+                    align="left" shader="flat"></a-text>
+            <a-text id="speed-text" value="0.0 km/h" color="#ffffff"
+                    width="1.5" align="left" position="0 -0.08 0"
+                    shader="flat"></a-text>
+          </a-entity>
+
+          <!-- Passos -->
+          <a-entity position="0.05 0 0.01">
+            <a-text value="PASSOS" color="#ff6b6b" width="1.2"
+                    align="left" shader="flat"></a-text>
+            <a-text id="steps-text" value="0" color="#ffffff"
+                    width="1.5" align="left" position="0 -0.08 0"
+                    shader="flat"></a-text>
+          </a-entity>
+
+          <!-- Distância -->
+          <a-entity position="0.05 -0.25 0.01">
+            <a-text value="DISTANCIA" color="#4ecdc4" width="1.2"
+                    align="left" shader="flat"></a-text>
+            <a-text id="distance-text" value="0.0 m" color="#ffffff"
+                    width="1.5" align="left" position="0 -0.08 0"
+                    shader="flat"></a-text>
+          </a-entity>
+
+        </a-entity>
+      </a-camera>
+    </a-entity>
+
+    <!-- Luz ambiente -->
+    <a-light type="ambient" color="#BBB"></a-light>
+  </a-scene>
+
+  <script>
+    AFRAME.registerComponent('vr-metrics', {
+      init: function() {
+        this.lastPosition = new THREE.Vector3();
+        this.totalDistance = 0;
+        this.steps = 0;
+        this.speed = 0;
+        this.lastTime = Date.now();
+        this.stepThreshold = 0.5;
+        this.distanceSinceLastStep = 0;
+
+        // Referências aos elementos de texto
+        this.speedText = document.querySelector('#speed-text');
+        this.stepsText = document.querySelector('#steps-text');
+        this.distanceText = document.querySelector('#distance-text');
+      },
+
+      tick: function() {
+        const currentPosition = this.el.object3D.position;
+        const currentTime = Date.now();
+        const deltaTime = (currentTime - this.lastTime) / 1000;
+
+        const distance = currentPosition.distanceTo(this.lastPosition);
+
+        if (distance > 0.001) {
+          this.totalDistance += distance;
+          this.distanceSinceLastStep += distance;
+
+          // Calcula velocidade (m/s para km/h)
+          this.speed = (distance / deltaTime) * 3.6;
+
+          // Conta passos
+          if (this.distanceSinceLastStep >= this.stepThreshold) {
+            this.steps++;
+            this.distanceSinceLastStep = 0;
+          }
+
+          // Atualiza UI
+          if (this.speedText) {
+            this.speedText.setAttribute('value', this.speed.toFixed(1) + ' km/h');
+          }
+          if (this.stepsText) {
+            this.stepsText.setAttribute('value', this.steps.toString());
+          }
+          if (this.distanceText) {
+            this.distanceText.setAttribute('value', this.totalDistance.toFixed(1) + ' m');
+          }
+        }
+
+        this.lastPosition.copy(currentPosition);
+        this.lastTime = currentTime;
+      }
+    });
+
+    // Sistema de inicialização
+    AFRAME.registerComponent('video-controls', {
+      init: function() {
+        const video = document.querySelector('#video360');
+        const startButton = document.querySelector('#start-button');
+        const playOverlay = document.querySelector('#play-overlay');
+
+        // Função para iniciar vídeo
+        const startVideo = () => {
+          console.log('Iniciando vídeo...');
+
+          // Tenta múltiplos métodos para garantir que o vídeo toque
+          video.play().then(() => {
+            console.log('Vídeo iniciado com sucesso!');
+            playOverlay.style.display = 'none';
+          }).catch((error) => {
+            console.error('Erro ao iniciar vídeo:', error);
+            // Tenta método alternativo do A-Frame
+            try {
+              const videosphere = document.querySelector('a-videosphere');
+              if (videosphere && videosphere.components && videosphere.components.material) {
+                const videoElement = videosphere.components.material.material.map.image;
+                videoElement.play();
+                playOverlay.style.display = 'none';
+              }
+            } catch(e) {
+              console.error('Método alternativo falhou:', e);
+            }
+          });
+        };
+
+        // Evento do botão
+        if (startButton) {
+          startButton.addEventListener('click', startVideo);
+        }
+
+        // Previne autoplay
+        video.pause();
+      }
+    });
+
+    // Quando a cena carregar
+    document.addEventListener('DOMContentLoaded', function() {
+      const scene = document.querySelector('a-scene');
+
+      scene.addEventListener('loaded', function() {
+        console.log('Cena A-Frame carregada');
+
+        // Adiciona componentes
+        const cameraRig = document.querySelector('#camera-rig');
+        if (cameraRig) {
+          cameraRig.setAttribute('vr-metrics', '');
+        }
+
+        const sceneEl = document.querySelector('a-scene');
+        if (sceneEl) {
+          sceneEl.setAttribute('video-controls', '');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
