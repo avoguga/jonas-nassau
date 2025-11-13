@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>Corrida VR - Protótipo</title>
+  <title>Corrida RVSaúde</title>
+  <link rel="icon" type="image/webp" href="logo.webp">
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <style>
     body {
@@ -17,44 +18,89 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, rgba(0,0,0,0.95), rgba(20,20,40,0.95));
+      background: linear-gradient(135deg, rgba(10,10,15,0.97), rgba(15,20,35,0.97));
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       z-index: 9999;
       cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+    #play-overlay img {
+      width: 600px;
+      max-width: 80%;
+      height: auto;
+      margin-bottom: 40px;
+      filter: drop-shadow(0 10px 40px rgba(0,217,255,0.3));
+      animation: logoFloat 3s ease-in-out infinite;
+    }
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
     }
     #play-overlay h1 {
-      color: #00ff88;
-      font-size: 48px;
-      margin-bottom: 20px;
-      font-family: 'Arial Black', sans-serif;
-      text-shadow: 0 0 20px rgba(0,255,136,0.5);
+      color: #00D9FF;
+      font-size: 56px;
+      margin-bottom: 30px;
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      font-weight: 700;
+      text-shadow: 0 0 30px rgba(0,217,255,0.4);
+      letter-spacing: 4px;
+      animation: titlePulse 3s ease-in-out infinite;
+    }
+    @keyframes titlePulse {
+      0%, 100% { opacity: 0.95; }
+      50% { opacity: 1; text-shadow: 0 0 40px rgba(0,217,255,0.6); }
     }
     #play-overlay button {
-      padding: 30px 70px;
-      font-size: 36px;
-      background: linear-gradient(135deg, #00ff88, #00cc66);
+      padding: 24px 60px;
+      font-size: 28px;
+      background: linear-gradient(135deg, #00D9FF, #00A3CC);
       color: #000;
-      border: none;
-      border-radius: 60px;
+      border: 2px solid rgba(0,217,255,0.3);
+      border-radius: 50px;
       cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 15px 40px rgba(0, 255, 136, 0.6);
-      transition: all 0.3s;
-      font-family: 'Arial Black', sans-serif;
+      font-weight: 600;
+      box-shadow: 0 10px 35px rgba(0, 217, 255, 0.5);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+    }
+    #play-overlay button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    #play-overlay button:hover::before {
+      width: 300px;
+      height: 300px;
     }
     #play-overlay button:hover {
-      transform: scale(1.1) translateY(-5px);
-      box-shadow: 0 20px 50px rgba(0, 255, 136, 0.8);
+      transform: scale(1.08) translateY(-4px);
+      box-shadow: 0 15px 50px rgba(0, 217, 255, 0.7);
+      border-color: rgba(0,217,255,0.6);
+    }
+    #play-overlay button:active {
+      transform: scale(1.02) translateY(-2px);
     }
   </style>
 </head>
 <body>
   <!-- Overlay de Play -->
   <div id="play-overlay">
-    <h1>🏃 CORRIDA VR</h1>
+    <img src="logo.webp" alt="VSAÚDE Logo">
+    <h1>CORRIDA RVSAÚDE</h1>
     <button id="start-button">▶ INICIAR EXPERIÊNCIA</button>
   </div>
 
@@ -71,94 +117,120 @@
              crossorigin="anonymous">
         <source src="jfk.webm" type="video/webm">
       </video>
+      <!-- Logo VSAÚDE -->
+      <img id="logo" src="logo.webp" crossorigin="anonymous">
     </a-assets>
 
     <!-- Vídeo 360 como videosphere -->
-    <a-videosphere src="#video360" rotation="0 180 0"></a-videosphere>
+    <a-videosphere src="#video360" rotation="0 0 0"></a-videosphere>
 
     <!-- Câmera com controles -->
-    <a-entity id="camera-rig" position="0 0 0">
+    <a-entity id="camera-rig" position="0 0 0" rotation="0 180 0">
       <a-camera id="main-camera" look-controls wasd-controls="acceleration: 20">
-        <a-cursor color="#00FF88"></a-cursor>
+        <a-cursor color="#00FFFF"></a-cursor>
 
-        <!-- UI fixa na câmera (HUD) - Canto Inferior Esquerdo -->
-        <a-entity id="hud" position="-1.4 -0.75 -2.2">
+        <!-- UI CIRCULAR ESTILO XBOX - Layout Y-X-B-A -->
+        <a-entity id="hud" position="-0.9 -0.5 -2">
 
-          <!-- Fundo principal com gradiente simulado -->
-          <a-plane color="#0a0a1a" opacity="0.92" width="1.1" height="0.95"
-                   radius="0.08" position="0.55 0.475 -0.01"></a-plane>
+          <!-- VELOCIDADE - Topo (Y - Amarelo) -->
+          <a-entity position="0 0.5 0">
+            <!-- Fundo circular escuro -->
+            <a-circle color="#0a0a0a" opacity="0.7" radius="0.24" segments="48"></a-circle>
 
-          <!-- Borda decorativa -->
-          <a-plane color="#00ff88" opacity="0.3" width="1.14" height="0.99"
-                   radius="0.09" position="0.55 0.475 -0.02"></a-plane>
+            <!-- Borda circular amarela -->
+            <a-ring color="#FFD700" opacity="0.85" radius-inner="0.23" radius-outer="0.25"
+                    segments-theta="48" position="0 0 0.001"></a-ring>
 
-          <!-- Header -->
-          <a-entity position="0.1 0.85 0.01">
-            <a-text value="🏃 MÉTRICAS" color="#00ff88" width="1.8"
-                    align="left" shader="flat" font="roboto"></a-text>
+            <!-- Label -->
+            <a-text value="VELOCIDADE" color="#FFD700" width="0.7" align="center"
+                    position="0 0.1 0.01" shader="flat" letter-spacing="1"></a-text>
+
+            <!-- Valor -->
+            <a-text id="speed-value" value="0" color="#FFFFFF" width="2" align="center"
+                    position="0 -0.02 0.01" shader="flat" font="roboto"></a-text>
+
+            <!-- Unidade -->
+            <a-text value="km/h" color="#CCAA55" width="0.6" align="center" opacity="0.85"
+                    position="0 -0.12 0.01" shader="flat"></a-text>
           </a-entity>
 
-          <!-- Linha divisória -->
-          <a-plane color="#00ff88" opacity="0.5" width="0.95" height="0.01"
-                   position="0.525 0.72 0.01"></a-plane>
+          <!-- DISTÂNCIA - Esquerda (X - Azul) -->
+          <a-entity position="-0.5 0 0">
+            <!-- Fundo circular -->
+            <a-circle color="#0a0a0a" opacity="0.7" radius="0.24" segments="48"></a-circle>
 
-          <!-- Card de Velocidade -->
-          <a-entity position="0.1 0.55 0.01">
-            <!-- Ícone de fundo -->
-            <a-plane color="#00ff88" opacity="0.15" width="0.9" height="0.18"
-                     radius="0.03" position="0.4 0 -0.005"></a-plane>
-            <a-text value="⚡ VELOCIDADE" color="#00ff88" width="1.3"
-                    align="left" shader="flat"></a-text>
-            <a-text id="speed-value" value="0.0" color="#ffffff"
-                    width="2.5" align="left" position="0 -0.12 0"
-                    shader="flat" font="roboto"></a-text>
-            <a-text value="km/h" color="#aaaaaa" width="0.9"
-                    align="left" position="0.45 -0.12 0" shader="flat"></a-text>
+            <!-- Borda circular azul -->
+            <a-ring color="#00BFFF" opacity="0.85" radius-inner="0.23" radius-outer="0.25"
+                    segments-theta="48" position="0 0 0.001"></a-ring>
+
+            <!-- Label -->
+            <a-text value="DISTÂNCIA" color="#00BFFF" width="0.7" align="center"
+                    position="0 0.1 0.01" shader="flat" letter-spacing="1"></a-text>
+
+            <!-- Valor -->
+            <a-text id="distance-value" value="0" color="#FFFFFF" width="2" align="center"
+                    position="0 -0.02 0.01" shader="flat" font="roboto"></a-text>
+
+            <!-- Unidade -->
+            <a-text value="metros" color="#5599BB" width="0.6" align="center" opacity="0.75"
+                    position="0 -0.12 0.01" shader="flat"></a-text>
           </a-entity>
 
-          <!-- Card de Passos -->
-          <a-entity position="0.1 0.25 0.01">
-            <!-- Ícone de fundo -->
-            <a-plane color="#ff6b6b" opacity="0.15" width="0.9" height="0.18"
-                     radius="0.03" position="0.4 0 -0.005"></a-plane>
-            <a-text value="👣 PASSOS" color="#ff6b6b" width="1.3"
-                    align="left" shader="flat"></a-text>
-            <a-text id="steps-value" value="0" color="#ffffff"
-                    width="2.5" align="left" position="0 -0.12 0"
-                    shader="flat" font="roboto"></a-text>
-            <a-text value="steps" color="#aaaaaa" width="0.9"
-                    align="left" position="0.35 -0.12 0" shader="flat"></a-text>
+          <!-- TEMPO - Direita (B - Vermelho) -->
+          <a-entity position="0.5 0 0">
+            <!-- Fundo circular -->
+            <a-circle color="#0a0a0a" opacity="0.7" radius="0.24" segments="48"></a-circle>
+
+            <!-- Borda circular vermelha -->
+            <a-ring color="#FF4444" opacity="0.85" radius-inner="0.23" radius-outer="0.25"
+                    segments-theta="48" position="0 0 0.001"></a-ring>
+
+            <!-- Label -->
+            <a-text value="TEMPO" color="#FF4444" width="0.7" align="center"
+                    position="0 0.1 0.01" shader="flat" letter-spacing="1"></a-text>
+
+            <!-- Valor -->
+            <a-text id="time-value" value="00:00" color="#FFFFFF" width="1.8" align="center"
+                    position="0 -0.02 0.01" shader="flat" font="roboto"></a-text>
+
+            <!-- Unidade -->
+            <a-text value="min:seg" color="#BB5555" width="0.6" align="center" opacity="0.75"
+                    position="0 -0.12 0.01" shader="flat"></a-text>
           </a-entity>
 
-          <!-- Card de Distância -->
-          <a-entity position="0.1 -0.05 0.01">
-            <!-- Ícone de fundo -->
-            <a-plane color="#4ecdc4" opacity="0.15" width="0.9" height="0.18"
-                     radius="0.03" position="0.4 0 -0.005"></a-plane>
-            <a-text value="📍 DISTÂNCIA" color="#4ecdc4" width="1.3"
-                    align="left" shader="flat"></a-text>
-            <a-text id="distance-value" value="0.0" color="#ffffff"
-                    width="2.5" align="left" position="0 -0.12 0"
-                    shader="flat" font="roboto"></a-text>
-            <a-text value="metros" color="#aaaaaa" width="0.9"
-                    align="left" position="0.45 -0.12 0" shader="flat"></a-text>
+          <!-- PASSOS - Embaixo (A - Verde) -->
+          <a-entity position="0 -0.5 0">
+            <!-- Fundo circular -->
+            <a-circle color="#0a0a0a" opacity="0.7" radius="0.24" segments="48"></a-circle>
+
+            <!-- Borda circular verde -->
+            <a-ring color="#00FF00" opacity="0.85" radius-inner="0.23" radius-outer="0.25"
+                    segments-theta="48" position="0 0 0.001"></a-ring>
+
+            <!-- Label -->
+            <a-text value="PASSOS" color="#00FF00" width="0.7" align="center"
+                    position="0 0.1 0.01" shader="flat" letter-spacing="1"></a-text>
+
+            <!-- Valor -->
+            <a-text id="steps-value" value="0" color="#FFFFFF" width="2" align="center"
+                    position="0 -0.02 0.01" shader="flat" font="roboto"></a-text>
+
+            <!-- Unidade -->
+            <a-text value="steps" color="#55BB55" width="0.6" align="center" opacity="0.75"
+                    position="0 -0.12 0.01" shader="flat"></a-text>
           </a-entity>
 
-          <!-- Card de Tempo -->
-          <a-entity position="0.1 -0.35 0.01">
-            <!-- Ícone de fundo -->
-            <a-plane color="#ffd93d" opacity="0.15" width="0.9" height="0.18"
-                     radius="0.03" position="0.4 0 -0.005"></a-plane>
-            <a-text value="⏱️ TEMPO" color="#ffd93d" width="1.3"
-                    align="left" shader="flat"></a-text>
-            <a-text id="time-value" value="00:00" color="#ffffff"
-                    width="2.2" align="left" position="0 -0.12 0"
-                    shader="flat" font="roboto"></a-text>
-            <a-text value="min" color="#aaaaaa" width="0.9"
-                    align="left" position="0.4 -0.12 0" shader="flat"></a-text>
+          <!-- Status indicator - círculo pequeno -->
+          <a-entity position="-0.75 -0.75 0.01">
+            <a-circle color="#00FF00" opacity="0.9" radius="0.018" segments="16"></a-circle>
+            <a-ring color="#00FF00" opacity="0.5" radius-inner="0.018" radius-outer="0.025"
+                    segments-theta="16" position="0 0 -0.001"></a-ring>
+            <a-text value="LIVE" color="#00FF00" width="0.45" align="left" opacity="0.9"
+                    position="0.05 -0.008 0" shader="flat" letter-spacing="2"></a-text>
           </a-entity>
 
         </a-entity>
+
       </a-camera>
     </a-entity>
 
@@ -167,6 +239,23 @@
   </a-scene>
 
   <script>
+    // Componente de animação da HUD
+    AFRAME.registerComponent('hud-animations', {
+      init: function() {
+        const hud = this.el;
+
+        // Fade-in suave ao carregar
+        hud.setAttribute('animation__fadein', {
+          property: 'opacity',
+          from: 0,
+          to: 1,
+          dur: 1000,
+          easing: 'easeOutQuad'
+        });
+      }
+    });
+
+
     // Componente de simulação de corrida
     AFRAME.registerComponent('running-simulator', {
       init: function() {
@@ -181,8 +270,8 @@
         this.targetSpeed = 0;
 
         // Parâmetros da corrida
-        this.baseSpeed = 8; // km/h base
-        this.maxSpeed = 15; // km/h máximo
+        this.baseSpeed = 9; // km/h base
+        this.maxSpeed = 16; // km/h máximo
         this.minSpeed = 5; // km/h mínimo
 
         // Referências aos elementos de texto
@@ -194,6 +283,10 @@
         // Para controle de passos
         this.stepTimer = 0;
         this.stepInterval = 0.5; // segundos entre passos na velocidade base
+
+        // Para transições suaves dos valores
+        this.displaySpeed = 0;
+        this.displayDistance = 0;
       },
 
       start: function() {
@@ -214,8 +307,8 @@
 
         // Varia a velocidade alvo de forma suave e realística
         // Usa seno para criar variações naturais
-        const speedVariation = Math.sin(this.elapsedTime * 0.3) * 2 +
-                              Math.sin(this.elapsedTime * 0.7) * 1.5;
+        const speedVariation = Math.sin(this.elapsedTime * 0.3) * 3 +
+                              Math.sin(this.elapsedTime * 0.7) * 2;
         this.targetSpeed = this.baseSpeed + speedVariation;
         this.targetSpeed = Math.max(this.minSpeed, Math.min(this.maxSpeed, this.targetSpeed));
 
@@ -242,14 +335,18 @@
       },
 
       updateUI: function() {
+        // Transições suaves para valores numéricos
+        this.displaySpeed += (this.currentSpeed - this.displaySpeed) * 0.15;
+        this.displayDistance += (this.totalDistance - this.displayDistance) * 0.1;
+
         if (this.speedText) {
-          this.speedText.setAttribute('value', this.currentSpeed.toFixed(1));
+          this.speedText.setAttribute('value', Math.round(this.displaySpeed).toString());
         }
         if (this.stepsText) {
           this.stepsText.setAttribute('value', this.steps.toString());
         }
         if (this.distanceText) {
-          this.distanceText.setAttribute('value', this.totalDistance.toFixed(0));
+          this.distanceText.setAttribute('value', Math.round(this.displayDistance).toString());
         }
         if (this.timeText) {
           const minutes = Math.floor(this.elapsedTime / 60);
@@ -330,6 +427,12 @@
         const sceneEl = document.querySelector('a-scene');
         if (sceneEl) {
           sceneEl.setAttribute('video-controls', '');
+        }
+
+        // Adiciona animações à HUD
+        const hud = document.querySelector('#hud');
+        if (hud) {
+          hud.setAttribute('hud-animations', '');
         }
       });
     });
