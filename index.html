@@ -107,15 +107,14 @@
   <a-scene>
     <!-- Assets -->
     <a-assets>
-      <!-- Vídeo 360 Equirectangular - jfk.webm -->
+      <!-- Vídeo 360 Equirectangular -->
       <video id="video360"
              playsinline
              webkit-playsinline
              loop="true"
-             muted
              preload="auto"
              crossorigin="anonymous">
-        <source src="jfk.webm" type="video/webm">
+        <source src="1113.mp4" type="video/mp4">
       </video>
       <!-- Logo VSAÚDE -->
       <img id="logo" src="logo.webp" crossorigin="anonymous">
@@ -125,7 +124,7 @@
     <a-videosphere src="#video360" rotation="0 0 0"></a-videosphere>
 
     <!-- Câmera com controles -->
-    <a-entity id="camera-rig" position="0 0 0" rotation="0 180 0">
+    <a-entity id="camera-rig" position="0 0 0" rotation="0 80 0">
       <a-camera id="main-camera" look-controls wasd-controls="acceleration: 20">
         <a-cursor color="#00FFFF"></a-cursor>
 

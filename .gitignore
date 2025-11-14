@@ -1,0 +1,10 @@
+# Arquivos de vídeo grandes
+*.mp4
+*.webm
+*.avi
+*.mov
+
+# Outros arquivos grandes
+*.zip
+*.rar
+*.tar.gz
