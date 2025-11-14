@@ -1,5 +1,4 @@
-# Arquivos de vídeo grandes
-*.mp4
+# Arquivos de vídeo grandes (mp4 agora usa Git LFS)
 *.webm
 *.avi
 *.mov
